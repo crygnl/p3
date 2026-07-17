@@ -461,10 +461,6 @@ align-self: flex-start;
 .card img { height: 220px; object-fit: cover; }
 #page-products .card:hover { transform: translateY(-5px); transition: .3s; }
 
-/* ══════════════════════════════════════════════
-   TABLET AND UP (min-width: 600px)
-   Progressive enhancement — scale UP from mobile
-   ══════════════════════════════════════════════ */
 @media (min-width: 600px) {
 header {
 padding: 10px 16px;
@@ -510,10 +506,6 @@ justify-content: space-between;
 .footer-copy { align-self: auto; }
 }
 
-/* ══════════════════════════════════════════════
-   DESKTOP AND UP (min-width: 900px)
-   Full multi-column layout
-   ══════════════════════════════════════════════ */
 @media (min-width: 900px) {
 header {
 flex-wrap: nowrap;
@@ -981,7 +973,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if (homeLink) homeLink.classList.add('nav-active');
 });
 
-// assisted myself with ai to code my search prompt (builddropdown, navigateto)
 </script>
 <footer>
 <div class="footer-inner">
