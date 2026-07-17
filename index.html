@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CryaGuides</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+min-height: 100vh;
+display: flex;
+flex-direction: column;
+font-family: 'Segoe UI', sans-serif;
+background: #fff;
+color: #000;
+}
+
+/* HEADER */
+header {
+display: flex;
+flex-wrap: wrap;
+align-items: center;
+padding: 10px 12px;
+gap: 8px;
+background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
+url('https://media.sketchfab.com/models/d67ec4686f81487486a4b03fcd6d40c9/fallbacks/4513c7b2459c485f9a1bafc1ad857664/cab2ee7b23744336873e63004c5d2b3d.jpeg') center/cover no-repeat;
+border-bottom: 2px solid #000;
+}
+.logo {
+font-size: 1.6rem;
+font-weight: 900;
+font-family: Georgia, serif;
+color: #fff;
+white-space: nowrap;
+cursor: pointer;
+transition: opacity 0.2s;
+}
+.logo:hover { opacity: 0.7; }
+nav {
+order: 3;
+width: 100%;
+display: flex;
+flex-wrap: wrap;
+align-items: center;
+font-size: 0.82rem;
+gap: 4px;
+margin-left: 0;
+}
+nav a {
+color: rgba(255,255,255,0.9);
+text-decoration: none;
+cursor: pointer;
+position: relative;
+padding-bottom: 2px;
+}
+nav a::after {
+content: '';
+position: absolute;
+left: 0; bottom: 0;
+width: 0; height: 2px;
+background: #fff;
+transition: width 0.2s ease;
+}
+nav a:hover::after,
+nav a.nav-active::after { width: 100%; }
+nav span { margin: 0 4px; color: rgba(255,255,255,0.4); }
+.search-container {
+position: relative;
+order: 4;
+width: 100%;
+}
+.search-wrap {
+display: flex;
+align-items: center;
+border: 1.5px solid rgba(255,255,255,0.7);
+padding: 4px 8px;
+width: 100%;
+transition: box-shadow 0.2s, border-color 0.2s;
+background: rgba(0,0,0,0.3);
+backdrop-filter: blur(4px);
+-webkit-backdrop-filter: blur(4px);
+}
+.search-wrap:focus-within {
+border-color: #fff;
+box-shadow: 0 0 0 2px rgba(255,255,255,0.2);
+}
+.search-wrap label { font-size: 1rem; margin-right: 6px; white-space: nowrap; color: rgba(255,255,255,0.7); }
+.search-wrap input { border: none; outline: none; width: 100%; font-size: 1rem; background: transparent; color: #fff; }
+.search-wrap input::placeholder { color: rgba(255,255,255,0.45); }
+.login-btn {
+order: 3;
+margin-left: auto;
+font-size: 0.82rem;
+cursor: pointer;
+white-space: nowrap;
+color: rgba(255,255,255,0.85);
+transition: opacity 0.2s;
+}
+.login-btn:hover { opacity: 0.6; }
+
+/* SEARCH DROPDOWN */
+.search-dropdown {
+display: none;
+position: absolute;
+top: calc(100% + 6px);
+left: 0;
+right: 0;
+width: 100%;
+background: #fff;
+border: 2px solid #000;
+box-shadow: 4px 4px 0 #000;
+z-index: 999;
+max-height: 420px;
+overflow-y: auto;
+scrollbar-width: thin;
+scrollbar-color: #bbb transparent;
+}
+.search-dropdown.visible { display: block; animation: dropIn 0.15s ease; }
+@keyframes dropIn {
+from { opacity: 0; transform: translateY(-6px); }
+to { opacity: 1; transform: translateY(0); }
+}
+.search-dropdown::-webkit-scrollbar { width: 5px; }
+.search-dropdown::-webkit-scrollbar-thumb { background: #bbb; border-radius: 4px; }
+.search-section-label {
+font-size: 0.72rem;
+font-weight: 700;
+text-transform: uppercase;
+letter-spacing: 0.08em;
+color: #fff;
+background: #000;
+padding: 5px 12px;
+position: sticky;
+top: 0;
+}
+.search-result-item {
+display: flex;
+align-items: flex-start;
+gap: 10px;
+padding: 10px 12px;
+border-bottom: 1px solid #eee;
+cursor: pointer;
+transition: background 0.12s, transform 0.12s;
+}
+.search-result-item:last-child { border-bottom: none; }
+.search-result-item:hover { background: #f5f5f5; transform: translateX(3px); }
+.search-result-icon {
+width: 30px; height: 30px;
+border-radius: 50%;
+display: flex; align-items: center; justify-content: center;
+font-size: 0.85rem;
+flex-shrink: 0;
+}
+.search-result-body { flex: 1; }
+.search-result-title { font-size: 0.88rem; font-weight: 600; line-height: 1.3; }
+.search-result-sub { font-size: 0.75rem; color: #888; margin-top: 1px; }
+.search-result-badge {
+font-size: 0.68rem;
+font-weight: 700;
+text-transform: uppercase;
+letter-spacing: 0.05em;
+padding: 2px 6px;
+border: 1.5px solid #000;
+white-space: nowrap;
+align-self: center;
+}
+.search-empty {
+padding: 18px 12px;
+font-size: 0.9rem;
+color: #888;
+text-align: center;
+}
+mark {
+background: #ffe066;
+color: #000;
+border-radius: 2px;
+padding: 0 1px;
+}
+@keyframes searchHighlight {
+0% { background: #ffe066; box-shadow: 0 0 0 4px #ffe066; }
+60% { background: #ffe066; box-shadow: 0 0 0 4px #ffe066; }
+100% { background: transparent; box-shadow: none; }
+}
+.search-highlighted {
+animation: searchHighlight 1.8s ease forwards;
+border-radius: 4px;
+}
+
+/* ── main ── */
+main {
+flex: 1;
+padding: 12px;
+position: relative;
+overflow: hidden;
+min-height: calc(100vh - 180px);
+}
+.breadcrumb {
+font-size: 0.9rem;
+margin-bottom: 12px;
+color: #555;
+letter-spacing: 0.02em;
+}
+/* transitioning the paging */
+.page {
+display: block;
+position: absolute;
+width: calc(100% - 40px);
+top: 0; left: 20px;
+opacity: 0;
+pointer-events: none;
+transform: translateY(14px);
+transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.page.active {
+position: relative;
+left: 0; width: 100%;
+opacity: 1;
+pointer-events: all;
+transform: translateY(0);
+}
+.page.exit {
+opacity: 0;
+transform: translateY(-10px);
+pointer-events: none;
+}
+
+/* home */
+.welcome {
+font-size: 1.35rem;
+font-weight: 400;
+margin-bottom: 20px;
+margin-left: 8px;
+border-left: 4px solid #000;
+padding-left: 12px;
+}
+.home-grid {
+display: grid;
+grid-template-columns: 1fr;
+gap: 12px;
+}
+.box {
+border: 2px solid #000;
+padding: 10px;
+min-height: unset;
+}
+.box-label {
+font-size: 0.85rem;
+font-weight: 600;
+text-transform: uppercase;
+letter-spacing: 0.05em;
+margin-bottom: 8px;
+}
+.sidebar { display: flex; flex-direction: column; gap: 12px; }
+.sidebar .box { min-height: unset; }
+.box-scroll {
+max-height: 420px;
+overflow-y: auto;
+scrollbar-width: thin;
+scrollbar-color: #bbb transparent;
+}
+.box-scroll::-webkit-scrollbar { width: 5px; }
+.box-scroll::-webkit-scrollbar-thumb { background: #bbb; border-radius: 4px; }
+.sidebar .box-scroll { max-height: 180px; }
+
+/* article rows */
+.article-row {
+display: flex;
+align-items: flex-start;
+gap: 8px;
+padding: 10px 2px;
+border-bottom: 1px solid #e8e8e8;
+cursor: pointer;
+border-radius: 4px;
+transition: background 0.15s, transform 0.15s;
+}
+.article-row:last-child { border-bottom: none; }
+.article-row:hover { background: #f5f5f5; transform: translateX(3px); }
+.article-icon {
+width: 30px; height: 30px;
+border-radius: 50%;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 0.85rem;
+flex-shrink: 0;
+}
+.article-body { flex: 1; }
+.article-title { font-size: 0.85rem; font-weight: 600; margin-bottom: 2px; line-height: 1.3; }
+.article-sub { font-size: 0.73rem; color: #666; }
+.article-meta {
+font-size: 0.7rem;
+color: #999;
+white-space: nowrap;
+text-align: right;
+min-width: 44px;
+}
+.article-count { font-size: 0.8rem; font-weight: 700; color: #333; display: block; }
+
+/* sidebar items */
+.side-item {
+display: flex;
+align-items: center;
+gap: 8px;
+padding: 8px 4px;
+border-bottom: 1px solid #eee;
+cursor: pointer;
+font-size: 0.82rem;
+border-radius: 3px;
+transition: background 0.15s, transform 0.15s;
+}
+.side-item:last-child { border-bottom: none; }
+.side-item:hover { background: #f5f5f5; transform: translateX(2px); }
+.side-dot { width: 8px; height: 8px; border-radius: 50%; background: #000; flex-shrink: 0; }
+.side-item-text { flex: 1; line-height: 1.3; }
+.side-item-sub { font-size: 0.75rem; color: #888; }
+
+/* about */
+#page-about {
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+min-height: 60vh;
+text-align: center;
+}
+.about-text { font-size: 0.95rem; line-height: 1.8; max-width: 700px; color: #111; text-align: justify; }
+
+/* ── faq ── */
+#page-faq { display: flex; flex-direction: column; align-items: center; }
+#page-faq .breadcrumb { align-self: flex-start; }
+.faq-list { border: 2px solid #000; overflow: hidden; max-width: 900px; width: 100%; }
+.faq-scroll {
+max-height: 500px;
+overflow-y: auto;
+scrollbar-width: thin;
+scrollbar-color: #bbb transparent;
+}
+.faq-scroll::-webkit-scrollbar { width: 5px; }
+.faq-scroll::-webkit-scrollbar-thumb { background: #bbb; border-radius: 4px; }
+.faq-item {
+padding: 12px;
+border-bottom: 1px solid #ccc;
+font-size: 0.88rem;
+cursor: pointer;
+display: flex;
+justify-content: space-between;
+align-items: center;
+transition: background 0.15s;
+}
+.faq-item::after {
+content: '+';
+font-size: 1.2rem;
+font-weight: 300;
+color: #999;
+flex-shrink: 0;
+margin-left: 12px;
+transition: transform 0.25s ease, color 0.2s;
+}
+.faq-item.open::after { transform: rotate(45deg); color: #000; }
+.faq-item:last-of-type { border-bottom: none; }
+.faq-item:hover { background: #f5f5f5; }
+.faq-answer {
+max-height: 0;
+overflow: hidden;
+font-size: 0.86rem;
+color: #444;
+background: #fafafa;
+border-bottom: 1px solid #ddd;
+padding: 0 16px;
+transition: max-height 0.35s ease, padding 0.25s ease;
+}
+.faq-item.open + .faq-answer { max-height: 200px; padding: 12px 16px 14px; }
+
+/* ── contacts ── */
+.contacts-grid {
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: 16px;
+margin-top: 10px;
+}
+.contact-box {
+border: 2px solid #000;
+padding: 16px;
+width: 100%;
+max-width: 480px;
+transition: box-shadow 0.2s;
+}
+.contact-box:hover { box-shadow: 4px 4px 0 #000; }
+.contact-box p { margin-bottom: 8px; font-size: 1rem; }
+.contact-box p:first-child { margin-bottom: 16px; }
+.social-box {
+border: 2px solid #000;
+padding: 16px;
+width: 100%;
+max-width: 480px;
+text-align: center;
+transition: box-shadow 0.2s;
+}
+.social-box:hover { box-shadow: 4px 4px 0 #000; }
+.social-box .label { font-size: 1rem; margin-bottom: 4px; }
+.social-box .links-title { font-size: 1.1rem; font-weight: bold; margin-bottom: 20px; }
+.social-links { display: flex; justify-content: center; gap: 24px; }
+.social-links a {
+color: #000;
+text-decoration: underline;
+cursor: pointer;
+font-size: 1.05rem;
+transition: opacity 0.2s;
+}
+.social-links a:hover { opacity: 0.5; }
+
+/* ── FOOTER ── */
+footer {
+border-top: 2px solid #000;
+background: #000;
+color: #fff;
+padding: 20px;
+}
+.footer-inner {
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+gap: 12px;
+max-width: 1200px;
+margin: 0 auto;
+}
+.footer-logo {
+font-size: 1.4rem;
+font-weight: 900;
+font-family: Georgia, serif;
+display: block;
+}
+.footer-tagline {
+font-size: 0.78rem;
+color: rgba(255,255,255,0.5);
+margin-top: 2px;
+}
+.footer-nav {
+display: flex;
+flex-wrap: wrap;
+gap: 12px;
+}
+.footer-nav a {
+color: rgba(255,255,255,0.75);
+text-decoration: none;
+font-size: 0.85rem;
+cursor: pointer;
+transition: color 0.2s;
+}
+.footer-nav a:hover { color: #fff; }
+.footer-copy {
+font-size: 0.7rem;
+color: rgba(255,255,255,0.4);
+white-space: nowrap;
+align-self: flex-start;
+}
+
+/* ── products (mobile base) ── */
+.card img { height: 220px; object-fit: cover; }
+#page-products .card:hover { transform: translateY(-5px); transition: .3s; }
+
+@media (min-width: 600px) {
+header {
+padding: 10px 16px;
+gap: 10px;
+}
+.logo { font-size: 1.8rem; }
+nav {
+font-size: 0.9rem;
+gap: 6px;
+}
+.search-container {
+width: auto;
+order: 2;
+margin-left: auto;
+}
+.search-wrap { min-width: 200px; width: auto; }
+.login-btn { order: 2; margin-left: 8px; }
+
+main { padding: 16px 20px; }
+.welcome { font-size: 1.6rem; }
+
+.home-grid { grid-template-columns: 1fr; gap: 16px; }
+.sidebar {
+flex-direction: row;
+gap: 12px;
+}
+.sidebar .box { flex: 1; }
+
+.article-title { font-size: 0.9rem; }
+.article-sub { font-size: 0.78rem; }
+
+.about-text { font-size: 1rem; }
+.faq-item { font-size: 0.95rem; }
+.faq-answer { font-size: 0.9rem; }
+
+.contact-box, .social-box { padding: 20px 28px; }
+
+.footer-inner {
+flex-direction: row;
+align-items: center;
+justify-content: space-between;
+}
+.footer-copy { align-self: auto; }
+}
+
+@media (min-width: 900px) {
+header {
+flex-wrap: nowrap;
+padding: 10px 20px;
+gap: 20px;
+}
+.logo { font-size: 2.2rem; }
+nav {
+order: initial;
+width: auto;
+flex: 1;
+flex-wrap: nowrap;
+font-size: 1rem;
+margin-left: 20px;
+}
+.search-container { order: initial; width: auto; margin-left: 0; }
+.search-wrap { min-width: 260px; }
+.login-btn { order: initial; margin-left: 10px; }
+
+.home-grid {
+grid-template-columns: 1fr 240px;
+gap: 16px;
+}
+.sidebar {
+flex-direction: column;
+gap: 16px;
+}
+.sidebar .box { min-height: 160px; }
+.box { min-height: 360px; }
+
+.article-icon { width: 36px; height: 36px; font-size: 1rem; }
+.article-title { font-size: 0.95rem; }
+.article-meta { min-width: 60px; font-size: 0.78rem; }
+.article-count { font-size: 0.9rem; }
+
+.welcome { font-size: 2rem; }
+.about-text { font-size: 1.15rem; }
+
+.contact-box, .social-box { width: 480px; padding: 24px 32px; }
+}
+
+
+/* ── Plain-CSS fallback for Products page (Tailwind removed for now) ── */
+.max-w-6xl { max-width: 72rem; }
+.mx-auto { margin-left: auto; margin-right: auto; }
+.py-8 { padding-top: 2rem; padding-bottom: 2rem; }
+.px-4 { padding-left: 1rem; padding-right: 1rem; }
+.text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
+.text-xl { font-size: 1.25rem; line-height: 1.75rem; }
+.font-bold { font-weight: 700; }
+.text-center { text-align: center; }
+.mb-8 { margin-bottom: 2rem; }
+.mb-4 { margin-bottom: 1rem; }
+.grid { display: grid; }
+.grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+.gap-6 { gap: 1.5rem; }
+.bg-white { background-color: #fff; }
+.rounded-xl { border-radius: 0.75rem; }
+.shadow-lg { box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1); }
+.overflow-hidden { overflow: hidden; }
+.w-full { width: 100%; }
+.h-56 { height: 14rem; }
+.object-cover { object-fit: cover; }
+.p-5 { padding: 1.25rem; }
+.text-gray-600 { color: #4b5563; }
+.bg-blue-600 { background-color: #2563eb; }
+.bg-green-600 { background-color: #16a34a; }
+.bg-black { background-color: #000; }
+.text-white { color: #fff; }
+#page-products button {
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  border: none;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: opacity 0.2s;
+}
+#page-products button:hover { opacity: 0.85; }
+@media (min-width: 768px) {
+  .md\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (min-width: 1024px) {
+  .lg\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+</style>
+</head>
+<body>
+<header>
+<span class="logo" onclick="showPage('home')">CryaGuides</span>
+<nav>
+<a data-page="home" onclick="showPage('home')">Home</a>
+<span>|</span>
+<a data-page="products" onclick="showPage('products')">Products</a><span>|</span><a data-page="about" onclick="showPage('about')">About Us</a>
+<span>|</span>
+<a data-page="faq" onclick="showPage('faq')">FAQ</a>
+<span>|</span>
+<a data-page="contacts" onclick="showPage('contacts')">Contacts</a>
+</nav>
+<div class="search-container">
+<div class="search-wrap">
+<label>Search:</label>
+<input id="search-input" type="text" placeholder="Search guides, forums...">
+</div>
+<div id="search-dropdown" class="search-dropdown"></div>
+</div>
+<a class="login-btn">Login/Signout</a>
+</header>
+<main>
+<!-- HOME -->
+<div id="page-home" class="page active">
+<div class="breadcrumb">Home</div>
+<div class="welcome">Welcome back, USER.</div>
+<div class="home-grid">
+<div class="box">
+<div class="box-label">Latest Guides / Articles</div>
+<div class="box-scroll">
+<div class="article-row" data-id="article-0">
+<div class="article-icon" style="background:#4a90d9;"> </div>
+<div class="article-body">
+<div class="article-title">How to Speed Up a Slow PC Without Buying New Hardware</div>
+<div class="article-sub">Performance · By CryaTeam · 2 hours ago</div>
+</div>
+<div class="article-meta"><span class="article-count">5.2k</span>views</div>
+</div>
+<div class="article-row" data-id="article-1">
+<div class="article-icon" style="background:#e07b39;"> </div>
+<div class="article-body">
+<div class="article-title">Top Settings to Boost FPS in Any Game — No Upgrade Needed</div>
+<div class="article-sub">Gaming · By ryzenfan · 5 hours ago</div>
+</div>
+<div class="article-meta"><span class="article-count">3.8k</span>views</div>
+</div>
+<div class="article-row" data-id="article-2">
+<div class="article-icon" style="background:#5cb85c;"> </div>
+<div class="article-body">
+<div class="article-title">Budget PC Upgrades: What to Buy First (RAM vs SSD vs GPU)</div>
+<div class="article-sub">Hardware · By techbudget · Yesterday</div>
+</div>
+<div class="article-meta"><span class="article-count">2.1k</span>views</div>
+</div>
+<div class="article-row" data-id="article-3">
+<div class="article-icon" style="background:#9b59b6;"> </div>
+<div class="article-body">
+<div class="article-title">Understanding Startup Apps: What's Safe to Disable?</div>
+<div class="article-sub">Tips & Tricks · By quietboot · 1 day ago</div>
+</div>
+<div class="article-meta"><span class="article-count">1.7k</span>views</div>
+</div>
+<div class="article-row" data-id="article-4">
+<div class="article-icon" style="background:#e74c3c;"> </div>
+<div class="article-body">
+<div class="article-title">Why Does My PC Freeze? A Practical Troubleshooting Guide</div>
+<div class="article-sub">Troubleshooting · By coldcase · 2 days ago</div>
+</div>
+<div class="article-meta"><span class="article-count">4.4k</span>views</div>
+</div>
+<div class="article-row" data-id="article-5">
+<div class="article-icon" style="background:#16a085;"> </div>
+<div class="article-body">
+<div class="article-title">Cable Management 101: Cleaner Setup, Better Airflow</div>
+<div class="article-sub">Setup · By neatdesk · 3 days ago</div>
+</div>
+<div class="article-meta"><span class="article-count">980</span>views</div>
+</div>
+<div class="article-row" data-id="article-6">
+<div class="article-icon" style="background:#2980b9;"> </div>
+<div class="article-body">
+<div class="article-title">Common Windows Error Codes and How to Fix Them Fast</div>
+<div class="article-sub">Troubleshooting · By errorbuster · 4 days ago</div>
+</div>
+<div class="article-meta"><span class="article-count">6.3k</span>views</div>
+</div>
+<div class="article-row" data-id="article-7">
+<div class="article-icon" style="background:#f39c12;"> </div>
+<div class="article-body">
+<div class="article-title">Memory Leaks Explained: Why Long Uptime Slows Your System</div>
+<div class="article-sub">Deep Dive · By kernelwatch · 5 days ago</div>
+</div>
+<div class="article-meta"><span class="article-count">1.2k</span>views</div>
+</div>
+</div>
+</div>
+<div class="sidebar">
+<div class="box">
+<div class="box-label">Featured Topics</div>
+<div class="box-scroll">
+<div class="side-item" data-id="topic-0">
+<div class="side-dot"></div>
+<div class="side-item-text">Best free tools to monitor PC temps<div class="side-item-sub">Hardware · Pinned</div></div>
+</div>
+<div class="side-item" data-id="topic-1">
+<div class="side-dot"></div>
+<div class="side-item-text">SSD vs HDD: Which should you get in 2025?<div class="side-item-sub">Storage ·
+Trending</div></div>
+</div>
+<div class="side-item" data-id="topic-2">
+<div class="side-dot"></div>
+<div class="side-item-text">How to read Windows Event Viewer logs<div class="side-item-sub">Troubleshooting</div></div>
+</div>
+<div class="side-item" data-id="topic-3">
+<div class="side-dot"></div>
+<div class="side-item-text">Setting up dual monitors on a budget<div class="side-item-sub">Setup Guide</div></div>
+</div>
+<div class="side-item" data-id="topic-4">
+<div class="side-dot"></div>
+<div class="side-item-text">Is your antivirus slowing you down?<div class="side-item-sub">Security · Popular</div></div>
+</div>
+</div>
+</div>
+<div class="box">
+<div class="box-label">Forums</div>
+<div class="box-scroll">
+<div class="side-item" data-id="forum-0">
+<div class="side-dot" style="background:#e74c3c;"></div>
+<div class="side-item-text">GPU fans spinning at max on idle?<div class="side-item-sub">techgremlin · 10 min
+ago</div></div>
+</div>
+<div class="side-item" data-id="forum-1">
+<div class="side-dot" style="background:#3498db;"></div>
+<div class="side-item-text">Anyone else's RAM showing wrong speed?<div class="side-item-sub">memspeed · 34 min
+ago</div></div>
+</div>
+<div class="side-item" data-id="forum-2">
+<div class="side-dot" style="background:#2ecc71;"></div>
+<div class="side-item-text">Best thermal paste brand right now?<div class="side-item-sub">pastemaster · 1 hr
+ago</div></div>
+</div>
+<div class="side-item" data-id="forum-3">
+<div class="side-dot" style="background:#f39c12;"></div>
+<div class="side-item-text">PC powers off randomly, no error shown<div class="side-item-sub">powerglitch · 2 hrs
+ago</div></div>
+</div>
+<div class="side-item" data-id="forum-4">
+<div class="side-dot" style="background:#9b59b6;"></div>
+<div class="side-item-text">Is it worth cleaning dust every 3 months?<div class="side-item-sub">dustcheck · 3 hrs
+ago</div></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- ABOUT -->
+<div id="page-about" class="page">
+<div class="breadcrumb">About Us</div>
+<p class="about-text">
+CryaGuides is a platform built to simplify complex ideas and turn them into clear, practical
+knowledge anyone can use. Focused on technology, gaming, and everyday problem-solving, we create
+guides that are straightforward, reliable, and easy to follow without unnecessary jargon. Our goal
+is to help users learn faster, fix issues confidently, and make smarter decisions whether they're
+building a setup, improving skills, or just exploring new interests. At its core, CryaGuides is
+about making information accessible and useful, not overwhelming.
+</p>
+</div>
+<!-- FAQ -->
+<div id="page-faq" class="page">
+<div class="breadcrumb">FAQ</div>
+<div class="faq-list faq-scroll">
+<div class="faq-item" onclick="toggleFaq(this)">Why is my PC suddenly so slow even though nothing changed?</div>
+<div class="faq-answer">Background processes, malware, or a full hard drive can cause sudden slowdowns even without visible
+changes. Try restarting, checking Task Manager, and running a disk cleanup.</div>
+<div class="faq-item" onclick="toggleFaq(this)">How do I get better FPS without upgrading my whole setup?</div>
+<div class="faq-answer">Lowering in-game settings, updating GPU drivers, closing background apps, and enabling Game Mode in
+Windows can significantly improve FPS without new hardware.</div>
+<div class="faq-item" onclick="toggleFaq(this)">What parts should I upgrade first on a budget?</div>
+<div class="faq-answer">RAM and an SSD give the most noticeable performance gains for the price. If gaming, the GPU is usually
+the next priority after storage.</div>
+<div class="faq-item" onclick="toggleFaq(this)">This error keeps popping up, how do I fix it?</div>
+<div class="faq-answer">Note the error code or message and search it along with your OS version. Most common errors have
+documented fixes on Microsoft's support pages or community forums.</div>
+<div class="faq-item" onclick="toggleFaq(this)">Any tips to make my setup cleaner or more efficient?</div>
+<div class="faq-answer">Cable management, removing unused apps, and organizing your desktop go a long way. Use tools like
+CCleaner for software clutter and zip ties for cables.</div>
+<div class="faq-item" onclick="toggleFaq(this)">Why do some apps run at startup even when I didn't open them?</div>
+<div class="faq-answer">Many apps add themselves to the startup list during installation. You can manage these in Task Manager
+under the Startup tab and disable what you don't need.</div>
+<div class="faq-item" onclick="toggleFaq(this)">What's really happening when my system freezes or crashes?</div>
+<div class="faq-answer">Freezes and crashes are often caused by overheating, RAM issues, driver conflicts, or failing storage.
+Check Event Viewer logs and monitor temps with HWMonitor.</div>
+<div class="faq-item" onclick="toggleFaq(this)">Why does my PC get slower the longer it stays on?</div>
+<div class="faq-answer">Memory leaks from apps and accumulated temporary files can degrade performance over time. Regular
+restarts and keeping software updated help prevent this.</div>
+</div>
+</div>
+<!-- CONTACTS -->
+<div id="page-contacts" class="page">
+<div class="breadcrumb">Contacts</div>
+<div class="contacts-grid">
+<div class="contact-box">
+<p>Got a question, issue, or suggestion? Reach out.</p>
+<p>Email: <a href="mailto:cryaguidessupport@gmail.com" style="color:#000;">cryaguidessupport@gmail.com</a></p>
+<p>Phone No: <a href="tel:0967137622" style="color:#000;">0967137622</a></p>
+<p>Landline: <a href="tel:88092031" style="color:#000;">8809-2031</a></p>
+</div>
+<div class="social-box">
+<div class="label">Community / Quick Help</div>
+<div class="links-title">LINKS</div>
+<div class="social-links">
+<a href="https://discord.com" target="_blank" rel="noopener">[ Discord ]</a>
+<a href="https://facebook.com" target="_blank" rel="noopener">[Facebook]</a>
+<a href="https://instagram.com" target="_blank" rel="noopener">[Instagram]</a>
+</div>
+</div>
+</div>
+</div>
+<div id="page-products" class="page">
+<div class="breadcrumb">Products</div>
+<div class="max-w-6xl mx-auto py-8 px-4">
+<h2 class="text-3xl font-bold text-center mb-8">PC Accessories</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<div class="bg-white rounded-xl shadow-lg overflow-hidden">
+<img src="https://ecommerce.datablitz.com.ph/cdn/shop/files/xdgnhfcghmd_800x.jpg?v=1765945081" class="w-full h-56 object-cover">
+<div class="p-5">
+<h3 class="text-xl font-bold">Gaming Mouse</h3>
+<p class="text-gray-600 mb-4">Lightweight RGB gaming mouse.</p>
+<button class="bg-blue-600 text-white px-4 py-2 rounded">Buy Now</button>
+</div>
+</div>
+<div class="bg-white rounded-xl shadow-lg overflow-hidden">
+<img src="https://ecommerce.datablitz.com.ph/cdn/shop/files/01_c5f678ae-0a37-4b24-9879-4d680b254279_800x.jpg?v=1731992305" class="w-full h-56 object-cover">
+<div class="p-5">
+<h3 class="text-xl font-bold">Mechanical Keyboard</h3>
+<p class="text-gray-600 mb-4">Mechanical keyboard.</p>
+<button class="bg-green-600 text-white px-4 py-2 rounded">Learn More</button>
+</div>
+</div>
+<div class="bg-white rounded-xl shadow-lg overflow-hidden">
+<img src="https://ecommerce.datablitz.com.ph/cdn/shop/products/71ap89elAuL._AC_SL1428_800x.jpg?v=1676782546" class="w-full h-56 object-cover">
+<div class="p-5">
+<h3 class="text-xl font-bold">Gaming Headset</h3>
+<p class="text-gray-600 mb-4">Surround sound headset.</p>
+<button class="bg-black text-white px-4 py-2 rounded">Buy Now</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<script>
+let currentPage = 'home';
+
+function showPage(id) {
+  if (id === currentPage) return;
+
+  const current = document.getElementById('page-' + currentPage);
+  const next = document.getElementById('page-' + id);
+
+  current.classList.add('exit');
+
+  setTimeout(() => {
+    current.classList.remove('active', 'exit');
+    next.classList.add('active');
+    currentPage = id;
+  }, 200);
+
+  document.querySelectorAll('nav a').forEach(a => {
+    a.classList.toggle('nav-active', a.dataset.page === id);
+  });
+}
+
+function toggleFaq(el) {
+  const isOpen = el.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+  if (!isOpen) el.classList.add('open');
+}
+
+// ── SEARCH DATA ──
+const ARTICLES = [
+  { id: 'article-0', icon: '💻', bg: '#4a90d9', title: 'How to Speed Up a Slow PC Without Buying New Hardware',   sub: 'Performance · By CryaTeam · 2 hours ago',      views: '5.2k' },
+  { id: 'article-1', icon: '🎮', bg: '#e07b39', title: 'Top Settings to Boost FPS in Any Game — No Upgrade Needed', sub: 'Gaming · By ryzenfan · 5 hours ago',            views: '3.8k' },
+  { id: 'article-2', icon: '🔧', bg: '#5cb85c', title: 'Budget PC Upgrades: What to Buy First (RAM vs SSD vs GPU)',  sub: 'Hardware · By techbudget · Yesterday',          views: '2.1k' },
+  { id: 'article-3', icon: '⚙️', bg: '#9b59b6', title: 'Understanding Startup Apps: What\'s Safe to Disable?',       sub: 'Tips & Tricks · By quietboot · 1 day ago',      views: '1.7k' },
+  { id: 'article-4', icon: '🌡️', bg: '#e74c3c', title: 'Why Does My PC Freeze? A Practical Troubleshooting Guide',  sub: 'Troubleshooting · By coldcase · 2 days ago',    views: '4.4k' },
+  { id: 'article-5', icon: '🗂️', bg: '#16a085', title: 'Cable Management 101: Cleaner Setup, Better Airflow',       sub: 'Setup · By neatdesk · 3 days ago',              views: '980'  },
+  { id: 'article-6', icon: '🛠️', bg: '#2980b9', title: 'Common Windows Error Codes and How to Fix Them Fast',       sub: 'Troubleshooting · By errorbuster · 4 days ago', views: '6.3k' },
+  { id: 'article-7', icon: '📦', bg: '#f39c12', title: 'Memory Leaks Explained: Why Long Uptime Slows Your System', sub: 'Deep Dive · By kernelwatch · 5 days ago',        views: '1.2k' },
+];
+
+const FORUMS = [
+  { id: 'forum-0', dot: '#e74c3c', title: 'GPU fans spinning at max on idle?',        sub: 'techgremlin · 10 min ago'  },
+  { id: 'forum-1', dot: '#3498db', title: 'Anyone else\'s RAM showing wrong speed?',  sub: 'memspeed · 34 min ago'     },
+  { id: 'forum-2', dot: '#2ecc71', title: 'Best thermal paste brand right now?',      sub: 'pastemaster · 1 hr ago'    },
+  { id: 'forum-3', dot: '#f39c12', title: 'PC powers off randomly, no error shown',   sub: 'powerglitch · 2 hrs ago'   },
+  { id: 'forum-4', dot: '#9b59b6', title: 'Is it worth cleaning dust every 3 months?',sub: 'dustcheck · 3 hrs ago'     },
+];
+
+const TOPICS = [
+  { id: 'topic-0', title: 'Best free tools to monitor PC temps',         sub: 'Hardware · Pinned'    },
+  { id: 'topic-1', title: 'SSD vs HDD: Which should you get in 2025?',  sub: 'Storage · Trending'   },
+  { id: 'topic-2', title: 'How to read Windows Event Viewer logs',       sub: 'Troubleshooting'      },
+  { id: 'topic-3', title: 'Setting up dual monitors on a budget',        sub: 'Setup Guide'          },
+  { id: 'topic-4', title: 'Is your antivirus slowing you down?',         sub: 'Security · Popular'   },
+];
+
+function navigateTo(targetId) {
+  searchDD.classList.remove('visible');
+  searchInput.value = '';
+  searchInput.blur();
+
+  const doScroll = () => {
+    const el = document.querySelector(`[data-id="${targetId}"]`);
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    el.classList.remove('search-highlighted');
+    void el.offsetWidth;
+    el.classList.add('search-highlighted');
+    el.addEventListener('animationend', () => el.classList.remove('search-highlighted'), { once: true });
+  };
+
+  if (currentPage !== 'home') {
+    showPage('home');
+    setTimeout(doScroll, 280);
+  } else {
+    doScroll();
+  }
+}
+
+function hl(text, q) {
+  if (!q) return text;
+  const re = new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+  return text.replace(re, '<mark>$1</mark>');
+}
+
+function buildDropdown(q) {
+  const dd = document.getElementById('search-dropdown');
+  const lq = q.trim().toLowerCase();
+
+  if (!lq) { dd.classList.remove('visible'); return; }
+
+  const matchA = ARTICLES.filter(a => a.title.toLowerCase().includes(lq) || a.sub.toLowerCase().includes(lq));
+  const matchF = FORUMS.filter(f =>  f.title.toLowerCase().includes(lq) || f.sub.toLowerCase().includes(lq));
+  const matchT = TOPICS.filter(t =>  t.title.toLowerCase().includes(lq) || t.sub.toLowerCase().includes(lq));
+
+  let html = '';
+
+  if (matchA.length) {
+    html += `<div class="search-section-label">Articles &amp; Guides</div>`;
+    matchA.forEach(a => {
+      html += `
+        <div class="search-result-item" onclick="navigateTo('${a.id}')">
+          <div class="search-result-icon" style="background:${a.bg}">${a.icon}</div>
+          <div class="search-result-body">
+            <div class="search-result-title">${hl(a.title, lq)}</div>
+            <div class="search-result-sub">${hl(a.sub, lq)}</div>
+          </div>
+          <div class="search-result-badge">${a.views} views</div>
+        </div>`;
+    });
+  }
+
+  if (matchF.length) {
+    html += `<div class="search-section-label">Forum Posts</div>`;
+    matchF.forEach(f => {
+      html += `
+        <div class="search-result-item" onclick="navigateTo('${f.id}')">
+          <div class="search-result-icon" style="background:${f.dot}; border-radius:50%;"></div>
+          <div class="search-result-body">
+            <div class="search-result-title">${hl(f.title, lq)}</div>
+            <div class="search-result-sub">${hl(f.sub, lq)}</div>
+          </div>
+          <div class="search-result-badge">Forum</div>
+        </div>`;
+    });
+  }
+
+  if (matchT.length) {
+    html += `<div class="search-section-label">Featured Topics</div>`;
+    matchT.forEach(t => {
+      html += `
+        <div class="search-result-item" onclick="navigateTo('${t.id}')">
+          <div class="search-result-icon" style="background:#000; border-radius:50%;"></div>
+          <div class="search-result-body">
+            <div class="search-result-title">${hl(t.title, lq)}</div>
+            <div class="search-result-sub">${hl(t.sub, lq)}</div>
+          </div>
+          <div class="search-result-badge">Topic</div>
+        </div>`;
+    });
+  }
+
+  if (!html) {
+    html = `<div class="search-empty">No results for "<strong>${q}</strong>"</div>`;
+  }
+
+  dd.innerHTML = html;
+  dd.classList.add('visible');
+}
+
+const searchInput = document.getElementById('search-input');
+const searchDD    = document.getElementById('search-dropdown');
+
+searchInput.addEventListener('input', e => buildDropdown(e.target.value));
+
+searchInput.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { searchDD.classList.remove('visible'); searchInput.blur(); }
+});
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.search-container')) searchDD.classList.remove('visible');
+});
+
+searchInput.addEventListener('focus', () => {
+  if (searchInput.value.trim()) buildDropdown(searchInput.value);
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  const homeLink = document.querySelector('nav a[data-page="home"]');
+  if (homeLink) homeLink.classList.add('nav-active');
+});
+
+</script>
+<footer>
+<div class="footer-inner">
+<div class="footer-brand">
+<span class="footer-logo">CryaGuides</span>
+<p class="footer-tagline">Clear guides for real problems.</p>
+</div>
+<div class="footer-copy">
+&copy; 2025 CryaGuides. All rights reserved.
+</div>
+</div>
+</footer>
+</body>
+</html>
